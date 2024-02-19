@@ -129,6 +129,7 @@ Console.WriteLine("Lista di numeri 1 maggiori di 3 in ordine decrescente:");
 Utilities.StampaListaInteri(numeriMaggiori3Decrescenti);
 Console.WriteLine("Lista di numeri 2 maggiori di 3 in ordine decrescente:");
 Utilities.StampaListaInteri(numeri2Maggiori3Decrescenti);
+
 public class Utilities
 {
 
