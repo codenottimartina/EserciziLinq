@@ -1,4 +1,178 @@
 ﻿using System.Linq;
+
+var studenti = new List<Studente>()
+{
+    new Studente()
+    {
+        Id = 1,
+        Nome = "pippo",
+        Eta = 9,
+        Corsi = new List<Corso>()
+        {
+            new Corso()
+            {
+                Id = 1,
+                Nome = "mat",
+                Crediti = 15
+            },
+            new Corso()
+            {
+                Id = 4,
+                Nome = "scienze",
+                Crediti = 15
+            },
+        }
+    },
+    new Studente()
+    {
+        Id = 2,
+        Nome = "pluto",
+        Eta = 15,
+        Corsi = new List<Corso>()
+        {
+            new Corso()
+            {
+                Id = 1,
+                Nome = "mat",
+                Crediti = 15
+            },
+            new Corso()
+            {
+                Id = 4,
+                Nome = "scienze",
+                Crediti = 15
+            },
+        }
+    },
+    new Studente()
+    {
+        Id = 3,
+        Nome = "paperino",
+        Eta = 35,
+        Corsi = new List<Corso>()
+        {
+            new Corso()
+            {
+                Id = 3,
+                Nome = "ita",
+                Crediti = 8
+            },
+            new Corso()
+            {
+                Id = 4,
+                Nome = "scienze",
+                Crediti = 15
+            },
+        }
+    },
+    new Studente()
+    {
+        Id = 4,
+        Nome = "minni",
+        Eta = 18,
+        Corsi = new List<Corso>()
+        {
+            new Corso()
+            {
+                Id = 2,
+                Nome = "geo",
+                Crediti = 10
+            },
+            new Corso()
+            {
+                Id = 3,
+                Nome = "ita",
+                Crediti = 8
+            },
+        }
+    },
+    new Studente()
+    {
+        Id = 5,
+        Nome = "gamba_di_legno",
+        Eta = 35,
+        Corsi = new List<Corso>()
+        {
+            new Corso()
+            {
+                Id = 3,
+                Nome = "ita",
+                Crediti = 8
+            },
+            new Corso()
+            {
+                Id = 4,
+                Nome = "scienze",
+                Crediti = 15
+            },
+        }
+    },
+    new Studente()
+    {
+        Id = 6,
+        Nome = "archimede",
+        Eta = 18,
+        Corsi = new List<Corso>()
+        {
+            new Corso()
+            {
+                Id = 2,
+                Nome = "geo",
+                Crediti = 10
+            },
+            new Corso()
+            {
+                Id = 3,
+                Nome = "ita",
+                Crediti = 8
+            },
+        }
+    },
+};
+
+var studenteConId1 = studenti.First(x => x.Id == 1);
+var studenteConId1_2 = studenti.FirstOrDefault(x => x.Id == 1);
+var studenteConId1_3 = studenti.Single(x => x.Id == 1);
+var studenteConId1_4 = studenti.SingleOrDefault(x => x.Id == 1);
+
+var studentiConCorsoGEO = studenti.Where(m => m.Corsi.Any(s => s.Nome == "geo")).ToList();
+
+var tuttiICorsi = studenti
+    .SelectMany(m => m.Corsi)
+    .DistinctBy(m => m.Id)
+    .ToList();
+
+var tuttiICorsiConAlmeno10CreditiAssegnatiAStudentiConPiuDi15Anni = studenti
+    .Where(m => m.Eta > 15)
+    .SelectMany(m => m.Corsi)
+    .DistinctBy(m => m.Id)
+    .Where(m => m.Crediti >= 10)
+    .ToList();
+
+var studentiLaCuiEtaSiaMaggioreOUgualeAllaSommaDeiCreditiDeiCorsiACuiRisultinoIscritti = studenti
+    .Where(m => m.Eta >= m.Corsi.Where(s => s.Id > 2).Sum(s => s.Crediti))
+    .ToList();
+
+var gruppiEtaStudenti = studenti
+    //.Where(m => m.Eta > 20)
+    .GroupBy(m => m.Eta)
+    .Where(m => m.Key > 20)
+    .ToList();
+
+var gruppiDiCorsiInBaseAiCrediti = studenti
+    .SelectMany(m => m.Corsi)
+    //.DistinctBy(m => m.Id)
+    .GroupBy(m => m.Crediti)
+    .Select(m => new GruppoCorsi() 
+        {
+            Crediti = m.Key,
+            Lista = m.DistinctBy(s => s.Id).ToList()
+        })
+    .ToList();
+
+
+Console.ReadLine();
+
 // lista di stringhe
 //var stringhe = new List<string>()
 //{
@@ -81,6 +255,10 @@
 //    }
 //}
 
+IHasId test = new Studente() { Id = 1, Nome = "asd", Eta = 5 };
+
+Corso stud = (Corso)test;
+
 // list di interi
 
 var numeri = new List<int>()
@@ -129,8 +307,16 @@ Console.WriteLine("Lista di numeri 1 maggiori di 3 in ordine decrescente:");
 Utilities.StampaListaInteri(numeriMaggiori3Decrescenti);
 Console.WriteLine("Lista di numeri 2 maggiori di 3 in ordine decrescente:");
 Utilities.StampaListaInteri(numeri2Maggiori3Decrescenti);
+
+
 public class Utilities
 {
+
+    public static bool ControlloStringheTutteUguali(List<string> stringhe)
+    {
+        return stringhe
+            .Aggregate(true, (res, str) => res && str.Equals(stringhe.First()));
+    }
 
     // Restitusice la lista con solo i numeri maggiori di 5
     public static List<int> NumeriMaggioriDi5(List<int> numeri)
@@ -180,4 +366,52 @@ public class Utilities
         }
         Console.WriteLine();
     }
+}
+
+
+public class Studente : IHasId
+{
+    public int Id { get; set; }
+    public string Nome { get; set; }
+    public int Eta { get; set; }
+    public IEnumerable<Corso> Corsi { get; set; }
+}
+
+public class Corso : IHasId
+{
+    public int Id { get; set; }
+    public string Nome { get; set; }
+    public int Crediti { get; set; }
+}
+
+public interface IHasId
+{
+    int Id { get; set; }
+}
+
+
+
+public static class IdUtils
+{
+    public static int GetIdDaListaEntita<T>(IEnumerable<T> entities)
+        where T : IHasId
+    {
+        return entities.Max(m => m.Id);
+    }
+
+    public static int GetIdMaxStudente(IEnumerable<Studente> studenti)
+    {
+        return studenti.Max(x => x.Id);
+    }
+
+    public static int GetIdMaxCorso(IEnumerable<Corso> corsi)
+    {
+        return corsi.Max(x => x.Id);
+    }
+}
+
+public class GruppoCorsi
+{
+    public int Crediti { get; set; }
+    public IEnumerable<Corso> Lista { get; set; }
 }
